@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+
+ 
+
+<html lang="en">
+
+ 
+
+ 
+
+ 
+
+<head>
+
+ 
+
+  <meta charset="UTF-8">
+
+ 
+
+  <title>Talend Finder</title>
+
+ 
+
+  <meta charset="UTF-8">
+
+ 
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+ 
+
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+ 
+
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles/style.css') }}">
+
+ 
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+
+ 
+
+</head>
+
+ 
+
+ 
+
+ 
+
+<body>
+
+ 
+
+  <section class="msger">
+
+ 
+
+    <header class="msger-header">
+
+ 
+
+      <div class="msger-header-title">
+
+ 
+
+        <b>TalentFinder</b><i class="fa fa-search" aria-hidden="true"></i>
+
+ 
+
+      </div>
+
+ 
+
+    </header>
+
+ 
+
+ 
+
+ 
+
+    <main class="msger-chat" id="msger-chat">
+
+ 
+
+      <div class="msg left-msg">
+
+ 
+
+        <div class="msg-img" style="background-image: url('./static/images/robot.png')"></div>
+
+ 
+
+        <div class="msg-bubble">
+
+ 
+
+          <div class="msg-info">
+
+ 
+
+            <div class="msg-info-name">TalentFinder</div>
+
+ 
+
+            <div class="msg-info-time">12:45</div>
+
+ 
+
+          </div>
+
+ 
+
+          <div class="msg-text">
+
+ 
+
+            Hi, welcome to TalentFinder! Go ahead and send me a description. 😄
+
+ 
+
+          </div>
+
+ 
+
+        </div>
+
+ 
+
+      </div>
+
+ 
+
+    </main>
+
+ 
+
+ 
+
+ 
+
+    <form class="msger-inputarea" onsubmit="sendMessage(); return false;">
+
+ 
+
+      <input type="text" class="msger-input" id="textInput" name="description" placeholder="Enter your description..." autocomplete="off">
+
+ 
+
+      <button type="submit" class="msger-send-btn">Send</button>
+
+ 
+
+    </form>
+
+ 
+
+ 
+
+ 
+
+  </section>
+
+ 
+
+ 
+
+ 
+
+  <script>
+
+ 
+
+    const msgerChat = document.getElementById("msger-chat");
+
+ 
+
+ 
+
+    function capitalizeFirstLetter(string) {
+
+    return string.toLowerCase().split(' ').map(word => word.charAt(0).toUpperCase() + word.substring(1)).join(' ');
+
+    }
+
+ 
+
+    function formatExperience(experience) {
+
+    // Convertir experience en flottant si ce n'est pas déjà le cas
+
+    if (typeof experience === "string") {
+
+        try {
+
+            experience = parseFloat(experience.split()[0]);
+
+        } catch (e) {
+
+            return "Invalid experience format";
+
+        }
+
+    }
+
+   
+
+    const years = Math.floor(experience);
+
+    const months = Math.round((experience - years) * 12);
+
+   
+
+    if (years === 0 && months === 0) {
+
+        return "No experience";
+
+    }
+
+ 
+
+    let result = "";
+
+ 
+
+    // Si seulement des mois sont présents
+
+    if (years === 0 && months > 0) {
+
+        return months + (months > 1 ? " months" : " month");
+
+    }
+
+ 
+
+    // Si seulement des années sont présentes
+
+    if (years > 0 && months === 0) {
+
+        return years + (years > 1 ? " years" : " year");
+
+    }
+
+ 
+
+    // Si à la fois des années et des mois sont présents
+
+    if (years > 0) {
+
+        result += years + (years > 1 ? " years" : " year");
+
+    }
+
+ 
+
+    if (months > 0) {
+
+        if (years > 0) result += " and ";
+
+        result += months + (months > 1 ? " months" : " month");
+
+    }
+
+ 
+
+    return result;
+
+}
+
+ 
+
+ 
+
+ 
+
+ 
+
+    function appendMessage(name, img, side, text) {
+
+ 
+
+      const msgHTML = `
+
+ 
+
+        <div class="msg ${side}-msg">
+
+ 
+
+          <div class="msg-img" style="background-image: url(${img})"></div>
+
+ 
+
+          <div class="msg-bubble">
+
+ 
+
+            <div class="msg-info">
+
+ 
+
+              <div class="msg-info-name">${name}</div>
+
+ 
+
+              <div class="msg-info-time">${formatDate(new Date())}</div>
+
+ 
+
+            </div>
+
+ 
+
+            <div class="msg-text">${text}</div>
+
+ 
+
+          </div>
+
+ 
+
+        </div>
+
+ 
+
+      `;
+
+ 
+
+ 
+
+ 
+
+      msgerChat.insertAdjacentHTML("beforeend", msgHTML);
+
+ 
+
+      msgerChat.scrollTop += 500;
+
+ 
+
+    }
+
+ 
+
+ 
+
+ 
+
+    function formatDate(date) {
+
+ 
+
+      const h = "0" + date.getHours();
+
+ 
+
+      const m = "0" + date.getMinutes();
+
+ 
+
+      return `${h.slice(-2)}:${m.slice(-2)}`;
+
+ 
+
+    }
+
+ 
+
+ 
+
+ 
+
+    function sendMessage() {
+
+ 
+
+      const msgText = document.getElementById("textInput").value;
+
+ 
+
+      if (!msgText) return;
+
+ 
+
+ 
+
+ 
+
+      appendMessage("You", "./static/images/HR.png", "right", msgText);
+
+ 
+
+ 
+
+ 
+
+      $.ajax({
+
+ 
+
+        url: "/predict",
+
+ 
+
+        type: "POST",
+
+ 
+
+        contentType: "application/json; charset=utf-8",
+
+ 
+
+        data: JSON.stringify({ description: msgText }),
+
+ 
+
+        dataType: "json",
+
+ 
+
+        success: function (data) {
+
+ 
+
+          displayResults(data);
+
+ 
+
+        },
+
+ 
+
+        error: function (jqXHR, textStatus, errorThrown) {
+
+            console.error("Request failed:", textStatus);
+
+            console.error("Error thrown:", errorThrown);
+
+            console.error("Full response:", jqXHR.responseText);
+
+        },
+
+ 
+
+ 
+
+      });
+
+ 
+
+ 
+
+ 
+
+      document.getElementById("textInput").value = "";
+
+ 
+
+    }
+
+ 
+
+ 
+
+ 
+
+    function displayResults(data) {
+
+ 
+
+    let resultsText = "";
+
+   
+
+ 
+
+ 
+
+ 
+
+    if (data.message) {
+
+ 
+
+        // S'il y a un message d'erreur ou d'information dans les données renvoyées
+
+ 
+
+        resultsText = `<strong><span style="font-size:1.2em;">😞 ${data.message}</span></strong>`;
+
+ 
+
+    } else {
+
+ 
+
+        resultsText = "Here are the top profiles based on your description:<br><br>";
+
+ 
+
+        let profileCount = 1;
+
+ 
+
+ 
+
+ 
+
+        for (const profile of data) {
+
+ 
+
+          let formattedDiploma = profile.Diploma.replace(/[\[\]]/g, '');
+
+          let formattedSkills = profile.Skills.replace(/[\[\]]/g, '');
+
+          if(!formattedDiploma.trim()) {
+
+              formattedDiploma = "undefined";
+
+          }
+
+ 
+
+          if(!formattedSkills.trim()) {
+
+              formattedSkills = "undefined";
+
+          }
+
+ 
+
+ 
+
+            resultsText += `
+
+ 
+
+                <div class="profile">
+
+ 
+
+                    <div class="profile-title">Profil ${profileCount}:</div>
+
+ 
+
+                    <div class="profile-data"><strong>Full Name:</strong> ${capitalizeFirstLetter(profile["Full Name"])}</div>
+
+                    <div class="profile-data"><strong>Job:</strong> ${capitalizeFirstLetter(profile["Job"])}</div>
+
+                    <div class="profile-data"><strong>Profil Url:</strong> <a href="${profile["Profil Url"]}">${profile["Profil Url"]}</a></div>
+
+                    <div class="profile-data"><strong>Email:</strong> <a href="mailto:${profile["Email"]}">${profile["Email"]}</a></div>
+
+                    <div class="profile-data"><strong>Phone:</strong> ${capitalizeFirstLetter(profile["Phone"])}</div>
+
+                    <div class="profile-data"><strong>Diploma:</strong> ${formattedDiploma}</div>
+
+                    <div class="profile-data"><strong>Skills:</strong> ${formattedSkills}</div>
+
+                    <div class="profile-data"><strong>Total Experience:</strong> ${formatExperience(profile["Total Experience"])}</div>
+
+                    <div class="profile-data"><strong>Matched by:</strong> ${(profile['Matched by'] * 100).toFixed(2)}%</div>
+
+                   
+
+             
+
+ 
+
+                </div>
+
+ 
+
+            `;
+
+ 
+
+            profileCount++;
+
+ 
+
+        }
+
+ 
+
+    }
+
+ 
+
+    appendMessage("TalentFinder", "./static/images/robot.png", "left", resultsText);
+
+ 
+
+}
+
+ 
+
+ 
+
+ 
+
+  </script>
+
+ 
+
+ 
+
+ 
+
+</body>
+
+ 
+
+ 
+
+ 
+
+</html>
